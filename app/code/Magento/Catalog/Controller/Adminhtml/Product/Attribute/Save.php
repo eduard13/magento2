@@ -36,6 +36,14 @@ use Magento\Framework\View\Result\PageFactory;
 class Save extends Attribute
 {
     /**
+     * Chars which should be escaped before str_parse
+     */
+    const ESCAPED_CHARS = [
+        '&' => '%26',
+        '+' => '%2B'
+    ];
+
+    /**
      * @var BuildFactory
      */
     protected $buildFactory;
@@ -324,12 +332,17 @@ class Save extends Attribute
      * @param array $data
      * @return void
      */
+
     private function preprocessOptionsData(&$data)
     {
         if (isset($data['serialized_options'])) {
             $serializedOptions = json_decode($data['serialized_options'], JSON_OBJECT_AS_ARRAY);
             foreach ($serializedOptions as $serializedOption) {
                 $option = [];
+                foreach (self::ESCAPED_CHARS as $char => $encodedChar) {
+                    $serializedOption = str_replace($char, $encodedChar, $serializedOption);
+                }
+
                 parse_str($serializedOption, $option);
                 $data = array_replace_recursive($data, $option);
             }
