@@ -9,6 +9,7 @@ namespace Magento\Reports\Controller\Adminhtml\Report;
 use Magento\Backend\Model\Auth\Session as AuthSession;
 use Magento\Backend\Model\Session;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 
 /**
  * Report statistics admin controller.
@@ -16,7 +17,7 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
  * @api
  * @since 100.0.2
  */
-abstract class Statistics extends \Magento\Backend\App\Action implements HttpGetActionInterface
+abstract class Statistics extends \Magento\Backend\App\Action implements HttpGetActionInterface, HttpPostActionInterface
 {
     /**
      * Authorization level of a basic admin session
