@@ -45,7 +45,7 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
-        return $apiKey;
+        return $apiKey ?? '';
     }
 
     /**
@@ -63,7 +63,7 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
-        return $apiIdentifier;
+        return $apiIdentifier ?? '';
     }
 
     /**
@@ -81,7 +81,7 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
-        return $orgUnitId;
+        return $orgUnitId ?? '';
     }
 
     /**
