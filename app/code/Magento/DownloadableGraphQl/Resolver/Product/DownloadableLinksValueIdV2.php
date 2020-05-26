@@ -17,6 +17,9 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
  */
 class DownloadableLinksValueIdV2 implements ResolverInterface
 {
+    /**
+     * Option type name
+     */
     private const OPTION_TYPE = 'downloadable';
 
     /**
@@ -30,7 +33,7 @@ class DownloadableLinksValueIdV2 implements ResolverInterface
         array $args = null
     ) {
         if (!isset($value['id']) || empty($value['id'])) {
-            throw new GraphQlInputException(__('Wrong format option data: `id` should not be empty.'));
+            throw new GraphQlInputException(__('Wrong format option data: "id" should not be empty.'));
         }
 
         $optionDetails = [

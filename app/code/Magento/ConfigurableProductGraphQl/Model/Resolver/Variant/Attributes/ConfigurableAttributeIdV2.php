@@ -7,21 +7,22 @@ declare(strict_types=1);
 
 namespace Magento\ConfigurableProductGraphQl\Model\Resolver\Variant\Attributes;
 
+use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
-use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 
 /**
- * @inheritdoc
- *
  * Format new option id_v2 in base64 encode for super attribute options
  */
 class ConfigurableAttributeIdV2 implements ResolverInterface
 {
+    /**
+     * Option type name
+     */
     private const OPTION_TYPE = 'configurable';
 
     /**
@@ -30,8 +31,6 @@ class ConfigurableAttributeIdV2 implements ResolverInterface
     private $eavAttribute;
 
     /**
-     * ConfigurableAttributeIdV2 constructor.
-     *
      * @param Attribute $eavAttribute
      */
     public function __construct(Attribute $eavAttribute)
@@ -40,18 +39,19 @@ class ConfigurableAttributeIdV2 implements ResolverInterface
     }
 
     /**
-     * @inheritdoc
-     *
-     * Create new option id_v2 that encodes details for each option and in most cases can be presented
-     * as base64("<option-type>/<attribute-id>/<value-index>")
+     * Create a option id_v2 for super attribute in "<option-type>/<attribute-id>/<value-index>" format
      *
      * @param Field $field
      * @param ContextInterface $context
      * @param ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
-     * @return Value|mixed|string
-     * @throws LocalizedException
+     *
+     * @return string
+     *
+     * @throws GraphQlInputException
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function resolve(
         Field $field,
@@ -60,24 +60,29 @@ class ConfigurableAttributeIdV2 implements ResolverInterface
         array $value = null,
         array $args = null
     ) {
-        $attribute_id = $this->eavAttribute->getIdByCode('catalog_product', $value['code']);
-        $optionDetails = [
-            self::OPTION_TYPE,
-            $attribute_id,
-            $value['value_index']
-        ];
+        if (!isset($value['code']) || empty($value['code'])) {
+            throw new GraphQlInputException(__('Wrong format option data: "code" should not be empty.'));
+        }
 
-        if (empty($attribute_id)) {
-            throw new LocalizedException(__('Wrong format option data: attribute_id should not be empty.'));
+        $attributeId = $this->eavAttribute->getIdByCode(Product::ENTITY, $value['code']);
+
+        if (empty($attributeId)) {
+            throw new GraphQlInputException(__('Wrong format option data: "attribute_id" should not be empty.'));
         }
 
         if (!isset($value['value_index']) || empty($value['value_index'])) {
-            throw new LocalizedException(__('Wrong format option data: value_index should not be empty.'));
+            throw new GraphQlInputException(__('Wrong format option data: "value_index" should not be empty.'));
         }
 
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $content = \implode('/', $optionDetails);
+        $optionDetails = [
+            self::OPTION_TYPE,
+            $attributeId,
+            $value['value_index']
+        ];
 
+        $content = implode('/', $optionDetails);
+
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         return base64_encode($content);
     }
 }

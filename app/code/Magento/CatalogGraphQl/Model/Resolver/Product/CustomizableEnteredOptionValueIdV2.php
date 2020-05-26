@@ -46,7 +46,7 @@ class CustomizableEnteredOptionValueIdV2 implements ResolverInterface
         array $args = null
     ) {
         if (!isset($value['option_id']) || empty($value['option_id'])) {
-            throw new GraphQlInputException(__('Wrong format option data: option_id should not be empty.'));
+            throw new GraphQlInputException(__('Wrong format option data: "option_id" should not be empty.'));
         }
 
         $optionDetails = [
